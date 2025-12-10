@@ -61,7 +61,7 @@ type listExpr struct {
 // Calling this function is no different than calling [query.List] and passing
 // multiple [query.Ident] expressions, for example,
 //
-//     query.List(query.Ident("id"), query.Ident("email"))
+//	query.List(query.Ident("id"), query.Ident("email"))
 //
 // The main difference is that the above will return an expression wrapped in a
 // pair of parentheses. This is still valid SQL code, this function simply exists
@@ -120,11 +120,11 @@ type identExpr string
 //
 // For example,
 //
-//     query.Join("users", query.Eq(query.Ident("posts.user_id"), query.Ident("users.id")))
+//	query.Join("users", query.Eq(query.Ident("posts.user_id"), query.Ident("users.id")))
 //
 // becomes,
 //
-//     JOIN users ON posts.user_id = users.id
+//	JOIN users ON posts.user_id = users.id
 func Ident(s string) Expr {
 	return identExpr(s)
 }
@@ -379,7 +379,7 @@ type asClause struct {
 
 // As specifies an AS expression on the given expression. For example,
 //
-//     query.As(query.Count("id"), "id_count")
+//	query.As(query.Count("id"), "id_count")
 func As(in Expr, out string) Expr {
 	return &asClause{
 		in:  in,

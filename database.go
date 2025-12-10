@@ -115,11 +115,11 @@ func List[M Model](col string, mm ...M) query.Expr {
 // too and aliased. The column names will be prefixed with the model's table
 // name, for example,
 //
-//     database.Columns(&Post{}, &User{})
+//	database.Columns(&Post{}, &User{})
 //
 // would result in the following SQL code,
 //
-//     posts.id, posts.user_id, posts.title, users.id AS users.id, users.email AS users.email
+//	posts.id, posts.user_id, posts.title, users.id AS users.id, users.email AS users.email
 //
 // Assuming that both the Post and User model have the above columns names.
 func Columns(primary Model, joins ...Model) query.Expr {
@@ -159,32 +159,32 @@ func Columns(primary Model, joins ...Model) query.Expr {
 // join the user of a post to each post that is queried, then the following code
 // would be written,
 //
-//     q := query.Select(
-//         database.Columns(&Post{}, &User{}),
-//         database.Join(&User{}, "user_id"),
-//     )
+//	q := query.Select(
+//	    database.Columns(&Post{}, &User{}),
+//	    database.Join(&User{}, "user_id"),
+//	)
 //
 // This would then result in the following SQL code when built,
 //
-//    SELECT posts.id,
-//        posts.user_id,
-//        posts.title,
-//        users.id AS users.id,
-//        users.email AS users.email
-//     JOIN users ON posts.user_id = users.id;
+//	SELECT posts.id,
+//	    posts.user_id,
+//	    posts.title,
+//	    users.id AS users.id,
+//	    users.email AS users.email
+//	 JOIN users ON posts.user_id = users.id;
 //
 // For joining on composite keys, the fields must line up with the composite
 // keys in the [PrimaryKey] of the [Model]. That is, if a model has a primary
 // key of,
 //
-//     &database.PrimaryKey{
-//         Columns: []string{"field_1", "field_2"},
-//         Values:  []any{m.Field1, m.Field2},
-//     }
+//	&database.PrimaryKey{
+//	    Columns: []string{"field_1", "field_2"},
+//	    Values:  []any{m.Field1, m.Field2},
+//	}
 //
 // then the fields must be passed like so,
 //
-//     database.Join(&Table2{}, "t2_field_1", "t2_field_2")
+//	database.Join(&Table2{}, "t2_field_1", "t2_field_2")
 func Join(m Model, fields ...string) query.Option {
 	pk := m.PrimaryKey()
 	table := m.Table()
