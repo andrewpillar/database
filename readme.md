@@ -510,10 +510,42 @@ be run.
 
 [query.Query]: https://pkg.go.dev/github.com/andrewpillar/database/query#Query
 
+### Options
+
+Options are the primary building blocks of the query builder. These are a first
+class function which take a query, modify it, and return it,
+
+```go
+type Option func(*Query) *Query
+```
+
+these are passed to the query functions to define how the query ought be built.
+Custom options can be defined by implementing a function that matches the Option
+definition. For example, let's consider a blogging application where you might
+want to implement a search functionality on posts by a tag. A custom option for
+this could be written like so,
+
+```go
+func Search(tag name) query.Option {
+    return func(q *query.Query) *query.Query {
+        return query.WhereIn("id", query.Select(
+            query.Columns("post_id"),
+            query.From("post_tags"),
+            query.WhereLike("name", query.Arg("%" + tag "%")),
+        ))(q)
+    }
+}
+```
+
+this custom option could then be used like so,
+
+```go
+pp, err := posts.Select(ctx, Search("programming"))
+```
+
 ### Expressions
 
-Expressions are the main building blocks of the query builder. These are
-presented via the [query.Expr][] type which is an interface that wraps the
+SQL expressions are represented via the [query.Expr][] interface that wraps the
 `Args` and `Build` methods.
 
 The `Args` method returns the list of arguments for the given expression, if
@@ -524,6 +556,8 @@ for passing arguments through to the underlying query being built. Calling
 `Build` on this expression directly would result in the `?` placeholder value
 being generated, what with the `Args` method return the actual argument that is
 given. For example,
+
+[query.Arg]: https://pkg.go.dev/github.com/andrewpillar/database/query#Arg
 
 ```go
 q := query.Select(
@@ -592,6 +626,7 @@ The [reflect][] package is used to handle the mapping of table data to structs.
 However, custom scanning can be implemented on a per-model basis via the
 [database.RowScanner][] interface.
 
+[reflect]: https://pkg.go.dev/reflect
 [database.RowScanner]: https://pkg.go.dev/github.com/andrewpillar/database#RowScanner
 
 For example,
@@ -621,10 +656,10 @@ func (n *Notification) Scan(r *database.Row) error {
 }
 ```
 
-with the above implementation, no reflection is used. Instead, the column
-mappings are defined manually within the `Scan` method, and [Row.Scan][] is
-called. This method takes a map of pointer values, and will scan in only the
-columns which exist within the row.
+with the above implementation, the user defines exactly how the row is scanned
+into the model. This is achieved by passing a map of pointer values to the
+[Row.Scan][] method. This will scan in only the columns that exist in the row
+and are defined in the given map.
 
 [Row.Scan]: https://pkg.go.dev/github.com/andrewpillar/database#Row.Scan
 
