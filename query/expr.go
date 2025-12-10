@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+// Expr represents an SQL expression.
+//
+// Args returns the list of arguments the SQL expression has. This is used to
+// correctly handle the parameter binding of dynamic arguments into a query.
+// It is valid for this to return nil.
+//
+// Build returns the SQL code that represents the expression.
 type Expr interface {
 	Args() []any
 
@@ -35,6 +42,8 @@ func (e exprs) Build() string {
 	return buf.String()
 }
 
+// Exprs turns the list of expressions into a single expression. When built the
+// expressions will be separated by the string ", ".
 func Exprs(e ...Expr) Expr {
 	return exprs(e)
 }
@@ -45,12 +54,28 @@ type listExpr struct {
 	args  []any
 }
 
+// Columns turns the given strings into a list expression of column names. This
+// would be used to control which columns should be retrieved as part of a
+// SELECT query.
+//
+// Calling this function is no different than calling [query.List] and passing
+// multiple [query.Ident] expressions, for example,
+//
+//     query.List(query.Ident("id"), query.Ident("email"))
+//
+// The main difference is that the above will return an expression wrapped in a
+// pair of parentheses. This is still valid SQL code, this function simply exists
+// for ease of use.
 func Columns(cols ...string) Expr {
 	return &listExpr{
 		items: cols,
 	}
 }
 
+// List turns the given values into a list expression. If the given values are
+// lists then they will be wrapped appropriately. If the given values are
+// literal expressions, then they will end up in the built SQL code verbatim and
+// not as placeholders.
 func List(vals ...any) Expr {
 	items := make([]string, 0, len(vals))
 	args := make([]any, 0, len(vals))
@@ -90,6 +115,16 @@ func (e *listExpr) Build() string {
 
 type identExpr string
 
+// Ident turns the given string into an identifier expression. This would be
+// used for referring directly to a column name in SQL.
+//
+// For example,
+//
+//     query.Join("users", query.Eq(query.Ident("posts.user_id"), query.Ident("users.id")))
+//
+// becomes,
+//
+//     JOIN users ON posts.user_id = users.id
 func Ident(s string) Expr {
 	return identExpr(s)
 }
@@ -101,6 +136,8 @@ type argExpr struct {
 	val any
 }
 
+// Arg turns the given value into an argument expression. This would be used for
+// passing user provided values into a query that should be bound to parameters.
 func Arg(val any) Expr {
 	return argExpr{
 		val: val,
@@ -114,6 +151,8 @@ type litExpr struct {
 	val any
 }
 
+// Lit turns the given value in a literal expression. This is passed directly
+// through into the query, and does not use a parameter binding for it.
 func Lit(val any) Expr {
 	return litExpr{
 		val: val,
@@ -128,6 +167,7 @@ type callExpr struct {
 	args []Expr
 }
 
+// Sum returns the SUM aggregate call expression on the given column.
 func Sum(col string) Expr {
 	return &callExpr{
 		name: "SUM",
@@ -137,6 +177,7 @@ func Sum(col string) Expr {
 	}
 }
 
+// Counte returns the COUNT aggregate call expression on the given columns.
 func Count(cols ...string) Expr {
 	args := make([]Expr, 0, len(cols))
 
@@ -166,6 +207,8 @@ type andOrExpr struct {
 	conds []Expr
 }
 
+// And takes the given expressions and joins them together using the AND clause
+// when built.
 func And(conds ...Expr) Expr {
 	return &andOrExpr{
 		conj:  " AND ",
@@ -173,6 +216,8 @@ func And(conds ...Expr) Expr {
 	}
 }
 
+// Or takes the given expressions and joins them together using the OR clause
+// when built.
 func Or(conds ...Expr) Expr {
 	return &andOrExpr{
 		conj:  " OR ",
@@ -204,6 +249,7 @@ type opExpr struct {
 	right Expr
 }
 
+// Eq a = b
 func Eq(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -212,6 +258,7 @@ func Eq(a, b Expr) Expr {
 	}
 }
 
+// Neq a != b
 func Neq(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -220,6 +267,7 @@ func Neq(a, b Expr) Expr {
 	}
 }
 
+// Gt a > b
 func Gt(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -228,6 +276,7 @@ func Gt(a, b Expr) Expr {
 	}
 }
 
+// Get a >= b
 func Geq(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -236,6 +285,7 @@ func Geq(a, b Expr) Expr {
 	}
 }
 
+// Lt a < b
 func Lt(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -244,6 +294,7 @@ func Lt(a, b Expr) Expr {
 	}
 }
 
+// Leq a <= b
 func Leq(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -252,6 +303,7 @@ func Leq(a, b Expr) Expr {
 	}
 }
 
+// Like a LIKE b
 func Like(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -260,6 +312,7 @@ func Like(a, b Expr) Expr {
 	}
 }
 
+// Is a IS b
 func Is(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -268,6 +321,7 @@ func Is(a, b Expr) Expr {
 	}
 }
 
+// IsNot a IS NOT b
 func IsNot(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -276,6 +330,7 @@ func IsNot(a, b Expr) Expr {
 	}
 }
 
+// In a IN b
 func In(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -284,6 +339,7 @@ func In(a, b Expr) Expr {
 	}
 }
 
+// NotIn a NOT IN b
 func NotIn(a, b Expr) Expr {
 	return &opExpr{
 		left:  a,
@@ -321,6 +377,9 @@ type asClause struct {
 	out string
 }
 
+// As specifies an AS expression on the given expression. For example,
+//
+//     query.As(query.Count("id"), "id_count")
 func As(in Expr, out string) Expr {
 	return &asClause{
 		in:  in,
@@ -328,6 +387,7 @@ func As(in Expr, out string) Expr {
 	}
 }
 
+// ColumnAs specifies an AS expression on the two columns.
 func ColumnAs(in, out string) Expr {
 	return As(Ident(in), out)
 }
