@@ -192,7 +192,7 @@ Each parameter is defined by one of three functions,
 * [database.CreateOnlyParam][]
 * [database.UpdateOnlyParam][]
 
-[database.MutableParam]: https://pkg.go.dev/github.com/andrewpillar/database#MutablePram
+[database.MutableParam]: https://pkg.go.dev/github.com/andrewpillar/database#MutableParam
 [database.CreateOnlyParam]: https://pkg.go.dev/github.com/andrewpillar/database#CreateOnlyParam
 [database.UpdateOnlyParam]: https://pkg.go.dev/github.com/andrewpillar/database#UpdateOnlyParam
 
@@ -235,9 +235,9 @@ type Post struct {
 ```
 
 The struct tag can also be used to map column names to nested fields within a
-model too. Assume there is a Post model that embeds a `User` model, and you
-want to map the `user_id` column to the `User.ID` field, then this can be
-achieved like so,
+model too. Assume there is a Post model that embeds a User model, and you want
+to map the `user_id` column to the `User.ID` field, then this can be achieved
+like so,
 
 ```go
 type User struct {
@@ -252,7 +252,7 @@ type Post struct {
 
 The format of `<column>:<field>` tells the scanner to map the column to the
 field on the underlying struct. This will only work if the field is a struct,
-has the necessary exported field, and is of type pointer.
+has the necessary exported field, and is a pointer.
 
 This can be taken a step further to scan data into embedded structs, via pattern
 matching,
