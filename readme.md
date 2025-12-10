@@ -465,7 +465,7 @@ lsit of models to delete. If an empty list is given then the methods do nothing,
 and no data is deleted.
 
 ```go
-pp, err := posts.Select(ctx)
+pp, err := posts.Select(ctx, query.Columns("*"))
 
 if err != nil {
     // Handle error.
