@@ -40,6 +40,8 @@ func NewDB(t *testing.T) *sql.DB {
 		q.Add("_pragma", pragma)
 	}
 
+	url.RawQuery = q.Encode()
+
 	db, err := sql.Open("sqlite", url.String())
 
 	if err != nil {
