@@ -622,9 +622,10 @@ in your Go code.
 
 ### Custom model scanning
 
-The [reflect][] package is used to handle the mapping of table data to structs.
-However, custom scanning can be implemented on a per-model basis via the
-[database.RowScanner][] interface.
+By default, the library makes use of [reflect][] to attempt to deduce how the
+columns should be mapped to the struct it is scanning data into. However, custom
+scanning can be implemented on a per-model basis via the [database.RowScanner][]
+interface.
 
 [reflect]: https://pkg.go.dev/reflect
 [database.RowScanner]: https://pkg.go.dev/github.com/andrewpillar/database#RowScanner
