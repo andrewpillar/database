@@ -527,12 +527,12 @@ want to implement a search functionality on posts by a tag. A custom option for
 this could be written like so,
 
 ```go
-func Search(tag name) query.Option {
+func Search(tag string) query.Option {
     return func(q *query.Query) *query.Query {
         return query.WhereIn("id", query.Select(
             query.Columns("post_id"),
             query.From("post_tags"),
-            query.WhereLike("name", query.Arg("%" + tag "%")),
+            query.WhereLike("name", query.Arg("%" + tag + "%")),
         ))(q)
     }
 }
