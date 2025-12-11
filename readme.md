@@ -285,7 +285,7 @@ type User struct {
 
 type Post struct {
     ID   int64
-    User *User `db:"user_id:id,users.*"`
+    User *User `db:"user_id:id,users.*:*"`
 }
 ```
 

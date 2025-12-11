@@ -149,39 +149,7 @@ func (sc *Scanner) getFields(rv reflect.Value) (*structFields, error) {
 			}
 
 			for _, col := range strings.Split(v, ",") {
-				switch {
-				case strings.Contains(col, "."):
-					parts := strings.SplitN(col, ".", 2)
-
-					prefix := parts[0]
-					pattern := parts[1]
-
-					if pattern == "" {
-						return nil, &StructFieldError{
-							Tag:    col,
-							Struct: rt.Name(),
-							Field:  sf.Name,
-							Err:    errors.New("missing mapping pattern"),
-						}
-					}
-
-					nested, err := sc.getFields(sv)
-
-					if err != nil {
-						return nil, &StructFieldError{
-							Struct: rt.Name(),
-							Field:  sf.Name,
-							Err:    err,
-						}
-					}
-
-					for _, fld := range nested.arr {
-						if pattern == "*" || fld.name == pattern {
-							fld.name = prefix + "." + fld.name
-							fields.put(fld.name, fld)
-						}
-					}
-				case strings.Contains(col, ":"):
+				if strings.Contains(col, ":") {
 					parts := strings.SplitN(col, ":", 2)
 
 					col = parts[0]
@@ -210,6 +178,29 @@ func (sc *Scanner) getFields(rv reflect.Value) (*structFields, error) {
 						}
 					}
 
+					if strings.Contains(col, ".") {
+						parts := strings.SplitN(col, ".", 2)
+
+						prefix := parts[0]
+
+						if prefix == "" {
+							return nil, &StructFieldError{
+								Tag:    col,
+								Struct: rt.Name(),
+								Field:  sf.Name,
+								Err:    errors.New("missing mapping prefix"),
+							}
+						}
+
+						if parts[1] == "*" {
+							for _, fld := range nested.arr {
+								fld.name = prefix + "." + fld.name
+								fields.put(fld.name, fld)
+							}
+							continue
+						}
+					}
+
 					if fld, ok := nested.get(target); ok {
 						fields.put(col, fld)
 						continue
@@ -220,13 +211,14 @@ func (sc *Scanner) getFields(rv reflect.Value) (*structFields, error) {
 							fields.put(fld.name, fld)
 						}
 					}
-				default:
-					fields.put(col, &structField{
-						name: col,
-						fold: foldFunc([]byte(col)),
-						val:  sv,
-					})
+					continue
 				}
+
+				fields.put(col, &structField{
+					name: col,
+					fold: foldFunc([]byte(col)),
+					val:  sv,
+				})
 			}
 			continue
 		}
@@ -307,8 +299,8 @@ func (sc *Scanner) toString(src any) string {
 // `db:"*:*"` Maps all of the columns to the underlying struct, useful for
 // working with embedded structs.
 //
-// `db:"users.*"` Maps all columns with the prefix of "users." to the underlying
-// struct, useful for working with related models via joins.
+// `db:"users.*:*"` Maps all columns with the prefix of "users." to the
+// underlying struct, useful for working with related models via joins.
 //
 // If no struct tags are specified then a comparison is done on the column name
 // and the field name to determine if the column should be scanned into the

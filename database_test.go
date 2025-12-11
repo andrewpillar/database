@@ -460,7 +460,7 @@ func (u *User) Params() Params {
 
 type Post struct {
 	ID    int64
-	User  *User `db:"user_id:id,users.*"`
+	User  *User `db:"user_id:id,users.*:*"`
 	Title string
 }
 
