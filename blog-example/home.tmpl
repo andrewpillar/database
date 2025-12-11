@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>VSBA - Very Simple Blogging App</title>
+	</head>
+	<body>
+		<form action="/posts" method="POST">
+			<div>
+				<label for="user">User</label>
+				<select id="user" name="user_id">
+					{{range .Users}}<option value="{{.ID}}">{{.Username}}</option>{{end}}
+				</select>
+			</div>
+			<div>
+				<label for="title">Title</label>
+				<input autocomplete="off" id="title" name="title" type="text"/>
+			</div>
+			<div>
+				<label for="tags">Tags</label>
+				<input autocomplete="off" id="tags" name="tags" type="text"/>
+			</div>
+			<div>
+				<textarea name="content" placeholder="What's on your mind?"></textarea>
+			</div>
+			<div>
+				<button type="submit">Post</button>
+			</div>
+		</form>
+		<div>
+			{{range .Posts}}
+				<div><strong>{{.Title}}</strong> by {{.User.Username}} on {{.CreatedAt.Format "Mon 02, Jan 2006 at 15:04"}}</div>
+				<ul>
+					{{range .Tags}}<li><a href="/?tag={{.}}">#{{.}}</a></li>{{end}}
+				</ul>
+				<div><pre>{{.Content}}</pre></div>
+			{{end}}
+		</div>
+	</body>
+</html>
