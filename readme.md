@@ -320,7 +320,7 @@ posts := database.NewStore(db, func() *Post {
 > **Note:** The type parameter is optional when creating a new store. They can
 > be given to provide more explicitness in code, such as `NewStore[*Post]`.
 
-In the above exmaple a new [database.Store][] is created for working with Post
+In the above example a new [database.Store][] is created for working with Post
 models. With this in place, Post models can now be created, retrieved, updated,
 and deleted.
 
