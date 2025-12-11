@@ -782,6 +782,8 @@ posts.Select(
 It is entirely possible to write these queries by hand, and make use of the
 [database.Scanner][] to achieve the same result,
 
+[database.Scanner]: https://pkg.go.dev/github.com/andrewpillar/database#Scanner
+
 ```go
 q := `
 SELECT posts.id,
