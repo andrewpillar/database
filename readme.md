@@ -834,7 +834,7 @@ application being developed to help convey how this library would be used in
 various scenarios. The source code for this blogging application exists within
 the repository at [blog-example][].
 
-[blog-example]: /tree/main/blog-example
+[blog-example]: /blog-example
 
 This is an extremely simple blogging application that will allow you to submit
 posts, and tag them as a user. This also has a rudimentary search system that
@@ -846,8 +846,8 @@ the ability to dynamically build queries based on input parameters sent in an
 HTTP request, and code that implements custom options to extend the
 functionality of the query builder for the application's use case.
 
-[handlers.go]: /blob/main/blog-example/handlers.go
-[post.go]: /blob/main/blog-example/post.go
+[handlers.go]: /blog-example/handlers.go
+[post.go]: /blog-example/post.go
 
 To build this application simply run,
 
