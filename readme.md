@@ -21,6 +21,7 @@ are working with.
 * [Examples](#examples)
   * [Custom model scanning](#custom-model-scanning)
   * [Model relations](#model-relations)
+  * [Blogging application](#blogging-application)
 
 [database/sql]: https://pkg.go.dev/database/sql
 
@@ -824,4 +825,32 @@ for rows.Next() {
         // Handle error.
     }
 }
+```
+
+### Blogging application
+
+Throughout this document, various references were made to an example blogging
+application being developed to help convey how this library would be used in
+various scenarios. The source code for this blogging application exists within
+the repository at [blog-example][].
+
+[blog-example]: /tree/main/blog-example
+
+This is an extremely simple blogging application that will allow you to submit
+posts, and tag them as a user. This also has a rudimentary search system that
+will allow you to search the posts that have been made via the tags they were
+assigned.
+
+The [handlers.go][] and [post.go][] files contain code that demonstrates both
+the ability to dynamically build queries based on input parameters sent in an
+HTTP request, and code that implements custom options to extend the
+functionality of the query builder for the application's use case.
+
+[handlers.go]: /blob/main/blog-example/handlers.go
+[post.go]: /blob/main/blog-example/post.go
+
+To build this application simply run,
+
+```shell
+$ go build -o blog ./blog-example
 ```
