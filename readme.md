@@ -571,6 +571,8 @@ q := query.Select(
 the `"user@example.com"` string is passed to the query being built as an
 argument, via the [query.WhereEq][] function.
 
+[query.WhereEq]: https://pkg.go.dev/github.com/andrewpillar/database/query#WhereEq
+
 Queries returned from the query functions can also be used as expressions, since
 these also implement the `Args` and `Build` methods. This allows for powerful
 queries to be built,
