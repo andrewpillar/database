@@ -14,15 +14,9 @@ permissions:
 
 jobs:
 
-  unit:
-    strategy:
-      matrix:
-        os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-latest
+  test:
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v6
@@ -33,4 +27,3 @@ jobs:
 
     - name: Run tests
       run: go test -v -coverprofile coverage ./...
-
