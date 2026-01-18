@@ -3,11 +3,26 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/andrewpillar/database/query"
 )
+
+type Null[T any] struct {
+	sql.Null[T]
+}
+
+// MarshalJSON returns the JSON representation of the null value. If the value
+// is null, then "null" is returned, otherwise the marshalled representation
+// of the underlying value is returned.
+func (n *Null[T]) MarshalJSON() ([]byte, error) {
+	if !n.Valid {
+		return []byte("null"), nil
+	}
+	return json.Marshal(n.V)
+}
 
 // PrimaryKey represents the primary key of a model. This is typically used to
 // query individual models by their primary key. This also supports composite
