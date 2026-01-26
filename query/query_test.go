@@ -11,7 +11,7 @@ func Test_Query(t *testing.T) {
 		{
 			"SELECT SUM(size) FROM files WHERE (user_id = $1)",
 			1,
-			Select(Sum("size"), From("files"), WhereEq("user_id", Arg(1))),
+			Select(Sum(Ident("size")), From("files"), WhereEq("user_id", Arg(1))),
 		},
 		{
 			"SELECT COUNT(*) FROM files",
@@ -456,6 +456,15 @@ func Test_Query(t *testing.T) {
 					Eq(Ident("t1.fk_2"), Ident("t2.pk_2")),
 					Eq(Ident("t1.fk_3"), Ident("t2.pk_3")),
 				)),
+			),
+		},
+		{
+			"SELECT * FROM t WHERE (LOWER(col) = LOWER($1))",
+			1,
+			Select(
+				Columns("*"),
+				From("t"),
+				Where(Eq(Lower(Ident("col")), Lower(Arg("string")))),
 			),
 		},
 	}

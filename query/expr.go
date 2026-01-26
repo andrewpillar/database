@@ -168,16 +168,25 @@ type callExpr struct {
 }
 
 // Sum returns the SUM aggregate call expression on the given column.
-func Sum(col string) Expr {
+func Sum(expr Expr) Expr {
 	return &callExpr{
 		name: "SUM",
 		args: []Expr{
-			Lit(col),
+			expr,
 		},
 	}
 }
 
-// Counte returns the COUNT aggregate call expression on the given columns.
+func Lower(expr Expr) Expr {
+	return &callExpr{
+		name: "LOWER",
+		args: []Expr{
+			expr,
+		},
+	}
+}
+
+// Count returns the COUNT aggregate call expression on the given columns.
 func Count(cols ...string) Expr {
 	args := make([]Expr, 0, len(cols))
 
@@ -191,7 +200,14 @@ func Count(cols ...string) Expr {
 	}
 }
 
-func (e *callExpr) Args() []any { return nil }
+func (e *callExpr) Args() []any {
+	args := make([]any, 0)
+
+	for _, expr := range e.args {
+		args = append(args, expr.Args()...)
+	}
+	return args
+}
 
 func (e *callExpr) Build() string {
 	args := make([]string, 0, len(e.args))
