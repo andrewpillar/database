@@ -405,7 +405,7 @@ func Test_Query(t *testing.T) {
 			),
 		},
 		{
-			"SELECT id AS 't.id', timestamp AS 't.timestamp' FROM t",
+			"SELECT id AS \"t.id\", timestamp AS \"t.timestamp\" FROM t",
 			0,
 			Select(
 				Exprs(
@@ -424,7 +424,7 @@ func Test_Query(t *testing.T) {
 			),
 		},
 		{
-			"SELECT posts.id AS 'id', posts.title AS 'title', users.id AS 'user.id' FROM posts JOIN users ON posts.user_id = users.id",
+			"SELECT posts.id AS \"id\", posts.title AS \"title\", users.id AS \"user.id\" FROM posts JOIN users ON posts.user_id = users.id",
 			0,
 			Select(
 				Exprs(
@@ -465,6 +465,23 @@ func Test_Query(t *testing.T) {
 				Columns("*"),
 				From("t"),
 				Where(Eq(Lower(Ident("col")), Lower(Arg("string")))),
+			),
+		},
+		{
+			"SELECT * FROM t WHERE (LOWER(col) IN (LOWER($1), LOWER($2), LOWER($3)))",
+			3,
+			Select(
+				Columns("*"),
+				From("t"),
+				Where(
+					In(
+						Lower(Ident("col")),
+						List(
+							Lower(Arg("val1")),
+							Lower(Arg("val2")),
+							Lower(Arg("val3")),
+						)),
+				),
 			),
 		},
 	}

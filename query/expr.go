@@ -85,6 +85,9 @@ func List(vals ...any) Expr {
 		case *listExpr:
 			items = append(items, expr.Build())
 			args = append(args, val)
+		case *callExpr:
+			items = append(items, expr.Build())
+			args = append(args, expr.Args()...)
 		case litExpr:
 			items = append(items, expr.Build())
 		case identExpr:
@@ -409,4 +412,4 @@ func ColumnAs(in, out string) Expr {
 }
 
 func (c *asClause) Args() []any   { return nil }
-func (c *asClause) Build() string { return fmt.Sprintf("%s AS '%s'", c.in.Build(), c.out) }
+func (c *asClause) Build() string { return fmt.Sprintf("%s AS %q", c.in.Build(), c.out) }
